@@ -10,4 +10,20 @@
         name: root
         state: present
         gid: 0
+    - name: 5.6.1.1 - Ensure password expiration date is 365 days or less
+      lineinfile:
+        path: /etc/login.defs
+        regexp: '^PASS_MAX_DAYS'
+        line: 'PASS_MAX_DAYS 365'
+
+    - name: Get list of all users with passwords
+      shell: cat /etc/shadow | grep -v ':\*:$' | cut -d ':' -f1
+      register: users_with_passwords
+      changed_when: false
+
+    - name: Modify user parameters for all users with a password set to match 365
+      shell: chage --maxdays 365 {{ item }}
+      loop: "{{ users_with_passwords.stdout_lines }}"
+
+  
       
