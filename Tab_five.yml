@@ -1,0 +1,13 @@
+---
+- name: Tab Five
+  hosts: your_target_hosts
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: 5.6.4- Ensure default group for root account is GID 0
+      group:
+        name: root
+        state: present
+        gid: 0
+      
