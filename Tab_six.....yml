@@ -1,0 +1,55 @@
+---
+- name: Tab six
+  hosts: your_target_hosts
+  become: true
+
+  tasks:
+    - name: 6.1.3 - Ensure permission on /etc/passwd are configured
+      file:
+        path: /etc/passwd
+        state: file
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: 6.1.4 - Ensure permissions on /etc/shadow are configured
+      file:
+        path: /etc/shadow
+        state: file
+        mode: '0000'
+        owner: root
+        group: root
+
+    - name: 6.1.5 - Ensure permissions on /etc/group are configured
+      file:
+        path: /etc/group
+        state: file
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: 6.1.6 - Ensure permissions on /etc/gshadow are configured
+      file: 
+        path: /etc/gshadow
+        state: file
+        mode: '0000'
+        owner: root
+        group: root
+
+    - name: 6.1.7 - Ensure permissions on /etc/passwd are configured
+      file:
+        path: /etc/passwd-
+        state: file
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: 6.1.8 - Ensure permissions on /etc/shadow- are configured
+      file:
+        path: /etc/shadow-
+        state: file
+        mode: '0000'
+        owner: root
+        group: root
+
+
