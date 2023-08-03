@@ -52,4 +52,44 @@
         owner: root
         group: root
 
+    - name: 6.1.9 - Ensure permissions on /etc/group- are configured
+      file:
+        path: /etc/group-
+        state: file
+        mode: '0644'
+        owner: root
+        group: root
+        
+    - name: 6.1.10 - Ensure permissions on /etc/gshadow- are configured
+      file:
+        path: /etc/gshadow-
+        state: file
+        mode: '0000'
+        owner: root
+        group: root
+
+    - name: 6.2.8 - Ensure root is the only UID 0 account
+      block:
+        - name: Get list of users with UID 0
+          shell: "awk -F ':' '$3 == 0 && $1 != \"root\" {print $1}' /etc/passwd"
+          register: users_with_uid_0
+
+       # - name: display
+       #  debug:
+       #    var: users_with_uid_0
+
+        - name: Reassign UIDs for users with UID 0 (if any )
+          shell: "usermod -u {{ new_uid }} {{ item }}"
+          loop: "{{ users_with_uid_0.stdout_lines }}"
+          vars:
+            new_uid: 1009 #change this value to the new UID you want to assign
+
+        - name: Remove users with UID 0 (except root)
+          user:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ users_with_uid_0.stdout_lines }}"
+
+
+
 
