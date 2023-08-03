@@ -90,6 +90,26 @@
             state: absent
           loop: "{{ users_with_uid_0.stdout_lines }}"
 
+    - name: 6.2.15 - Ensure no users have .netrc files
+      block:
+        - name: Find all .netrc files
+          find:
+            path: /home
+            recurse: true 
+            patterns: ".netrc"
+          register: netrc_files
+
+        - name: Print
+          debug:
+            var: netrc_files
+
+        - name: Remove .netrc files
+          file:
+            path: "{{ item.path }}"
+            state: absent
+          loop: "{{ netrc_files.files }}"
+
+
 
 
 
