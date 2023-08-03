@@ -4,6 +4,10 @@
   become: true
 
   tasks:
+  # - name: 6.1.1 - Audit system file permissions
+  
+  # - name: 6.1.2 - Ensure sticky bit is set on all world-writable directories
+
     - name: 6.1.3 - Ensure permission on /etc/passwd are configured
       file:
         path: /etc/passwd
