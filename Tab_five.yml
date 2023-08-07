@@ -71,7 +71,7 @@
 
         - name: 5.6.1.5- Investigate any users with a password change date in future | save list
           copy:
-            dest: my_file
+            dest: file_5_6_1_5
             content: "{{ output.stdout_lines }}"
 
 
