@@ -72,6 +72,24 @@
         owner: root
         group: root
 
+    - name: 6.1.11- Ensure no world writable files exist
+      block:
+        - name: 6.1.11- Ensure no world writable files exist | find files
+          shell: df --local -P | awk '{if (NR!=1) print $6}' | sudo xargs -I '{}' find '{}' -xdev -type f -perm -0002 2> /dev/null && true || true 
+          register: output_6_1_11
+
+        - name: 6.1.11- Ensure no world writable files exist | save output
+          copy:
+            dest: file_6_1_11
+            content: "{{ output_6_1_11.stdout_lines }}"
+
+        - name: 6.1.11 - Ensure no world writable files exist | fix permission
+          file:
+            path: "{{ item }}"
+            mode: "o-w"
+          loop: "{{ output_6_1_11.stdout_lines }}"
+
+
     - name: 6.2.8 - Ensure root is the only UID 0 account
       block:
         - name: Get list of users with UID 0
