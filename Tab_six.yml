@@ -105,6 +105,24 @@
             group: root
           loop: "{{ output_6_1_13.stdout_lines }}"
 
+    - name: 6.2.1 Ensure password fields are not empty
+      block:
+        - name: 6.2.1  Ensure password fields are not empty | list
+          shell: |
+            awk -F: '($2 == "" ) { print $1 }' /etc/shadow
+          register: output_6_2_1
+        - name: 6.2.1 Ensure password fields are not empty | Save output
+          copy:
+            dest: file_6_2_2
+            content: "{{ output_6_2_1.stdout_lines }}"
+        - name: 6.2.1 Ensure password fields are not empty | Lock account
+          user:
+            name: "{{ item }}"
+            password_lock: yes
+          loop: "{{ output_6_2_1.stdout_lines }}"
+          when:
+            - "{{ output_6_2_1.stdout_lines }}"
+
 
     - name: 6.2.8 - Ensure root is the only UID 0 account
       block:
