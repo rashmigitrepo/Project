@@ -96,7 +96,7 @@
           register: output_6_1_13
         - name: 6.1.13 Ensure no ungrouped files or directories exist | Save output
           copy:
-            dest: "{{ outputfiles }}/6.1.13"
+            dest: file_6_1_13
             content: "{{ output_6_1_13.stdout_lines }}"
         - name: 6.1.13 Ensure no ungrouped files or directories exist | Fix
           file:
