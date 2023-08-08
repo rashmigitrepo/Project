@@ -146,9 +146,9 @@
             state: absent
           loop: "{{ users_with_uid_0.stdout_lines }}"
 
-    - name: 6.2.9 Audit system file permissions
+    - name: 6.2.9 Ensure all users' home directory exist
       script: script_6_2_9.sh
-      register: output_6_1_1
+      
     
 
     - name: 6.2.15 - Ensure no users have .netrc files
