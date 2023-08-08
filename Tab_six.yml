@@ -89,6 +89,22 @@
             mode: "o-w"
           loop: "{{ output_6_1_11.stdout_lines }}"
 
+    - name: 6.1.13 Ensure no ungrouped files or directories exist
+      block:
+        - name: 6.1.13 Ensure no ungrouped files or directories exist | Find
+          shell: df --local -P | awk '{if (NR!=1) print $6}' | sudo xargs -I '{}' find '{}' -xdev -nogroup 2> /dev/null && true || true
+          register: output_6_1_13
+        - name: 6.1.13 Ensure no ungrouped files or directories exist | Save output
+          copy:
+            dest: "{{ outputfiles }}/6.1.13"
+            content: "{{ output_6_1_13.stdout_lines }}"
+        - name: 6.1.13 Ensure no ungrouped files or directories exist | Fix
+          file:
+            path: "{{ item }}"
+            owner: "{{ withoutOwnerFileDirOwner }}"
+            group: "{{ withoutGroupFilesDirGroup }}"
+          loop: "{{ output_6_1_13.stdout_lines }}"
+
 
     - name: 6.2.8 - Ensure root is the only UID 0 account
       block:
