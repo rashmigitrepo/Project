@@ -101,8 +101,8 @@
         - name: 6.1.13 Ensure no ungrouped files or directories exist | Fix
           file:
             path: "{{ item }}"
-            owner: "{{ withoutOwnerFileDirOwner }}"
-            group: "{{ withoutGroupFilesDirGroup }}"
+            owner: root
+            group: root
           loop: "{{ output_6_1_13.stdout_lines }}"
 
 
