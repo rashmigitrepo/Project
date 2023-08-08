@@ -1,3 +1,4 @@
+awk -F: 'NR==FNR{a[$1];next} !($1 in a) {print \"Group\",$1,\"from /etc/passwd has no matching entry in /etc/group\"}' /etc/group /etc/passwd"
 ---
 - name: Tab six
   hosts: your_target_hosts
