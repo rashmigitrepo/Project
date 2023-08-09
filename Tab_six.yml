@@ -159,6 +159,9 @@
       script: script_6_2_12.sh
 
 
+  
+  # - name: 6.2.15 Ensure no users have .netrc files
+  #   script: script_6_2_15.sh
 
       
     
