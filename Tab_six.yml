@@ -155,6 +155,10 @@
     - name: 6.2.11 Remove permissions is excess of 750 from users home directories
       script: script_6_2_11.sh
 
+    - name: 6.2.12 Ensure users dot files are not group or world writable
+      script: script_6_2_12.sh
+
+
 
       
     
