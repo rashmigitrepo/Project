@@ -158,6 +158,8 @@
     - name: 6.2.12 Ensure users dot files are not group or world writable
       script: script_6_2_12.sh
 
+    - name: 6.2.14 Ensure no users have .forward files
+      script: script_6_2_14.sh
 
   
     - name: 6.2.15 Ensure no users have .netrc files
