@@ -114,7 +114,31 @@
     - name: 5.1.9 Ensure at is restricted to authorized users | Display message when "at" is not installed
       debug:
         msg: "at is not installed on the system"
-      when: "'at' not in ansible_facts['packages']"   
+      when: "'at' not in ansible_facts['packages']" 
+
+    - name: 5.2.1 Ensure permissions on /etc/ssh/sshd_config are configured
+      file:
+        dest: /etc/ssh/sshd_config
+        state: file
+        owner: root
+        group: root
+        mode: og-rwx
+
+        - name: 5.2.2 Ensure permissions on SSH private host key files are configured
+  block:
+    - name: 5.2.2 Ensure permissions on SSH private host key files are configured | find keys
+      shell: |
+        find /etc/ssh -xdev -type f -name 'ssh_host_*_key'  && true || true
+      register: private_keys
+    - name: 5.2.2 Ensure permissions on SSH private host key files are configured | fix permissions
+      file:
+        dest: "{{ item }}"
+        state: file
+        owner: root
+        group: root
+        mode: 0600
+      with_items: "{{ private_keys.stdout_lines }}"
+      when: "{{ private_keys.stdout_lines|length > 0 }}"
         
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
