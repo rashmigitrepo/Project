@@ -132,9 +132,9 @@
             find /etc/ssh -xdev -type f -name 'ssh_host_*_key'
           register: private_keys
 
-        - name: print registered variable value
-          debug:
-            var: private_keys
+        #- name: print registered variable value
+        #  debug:
+         #   var: private_keys
         - name: 5.2.2 Ensure permissions on SSH private host key files are configured | fix permissions
           file:
             dest: "{{ item }}"
@@ -152,9 +152,9 @@
             find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub'
           register: public_keys
 
-        - name: print registered variable value
-          debug:
-            var: public_keys
+       # - name: print registered variable value
+       #   debug:
+        #    var: public_keys
         - name: 5.2.3 Ensure permissions on SSH public host key files are configured | fix permissions
           file:
             dest: "{{ item }}"
