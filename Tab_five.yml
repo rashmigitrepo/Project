@@ -145,6 +145,27 @@
           with_items: "{{ private_keys.stdout_lines }}"
           when: private_keys.stdout_lines | length > 0 
 
+    - name: 5.2.3  Ensure permissions on SSH public host key files are configured
+      block:
+        - name: 5.2.3 Ensure permissions on SSH public host key files are configured | find keys
+          shell: |
+            find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub'
+          register: public_keys
+
+        - name: print registered variable value
+          debug:
+            var: public_keys
+        - name: 5.2.3 Ensure permissions on SSH public host key files are configured | fix permissions
+          file:
+            dest: "{{ item }}"
+            state: file
+            owner: root
+            group: root
+            mode: u-x,go-wx
+          with_items: "{{ public_keys.stdout_lines }}"
+          when: public_keys.stdout_lines | length > 0 
+
+
         
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
