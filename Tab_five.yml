@@ -89,7 +89,32 @@
       debug:
         msg: "cron is not installed on the system"
       when: "'cronie' not in ansible_facts['packages']"
-        
+      
+    - name: 5.1.9 Ensure at is restricted to authorized users | Gather package facts for "at"
+      package_facts:
+        manager: auto
+      block:
+        - name: 5.1.9 Ensure at is restricted to authorized users | When at is installed | remove /etc/at.deny
+          file:
+            path: /etc/at.deny
+            state: absent
+          ignore_errors: yes
+        - name: 5.1.9 Ensure at is restricted to authorized users | When at is installed | stats of /etc/at.allow 
+          stat:
+            path: /etc/at.allow
+          register: afile
+        - name: 5.1.9 Ensure at is restricted to authorized users | create , change ownership and mode of /etc/at.allow
+          file:
+            path: /etc/at.allow
+            state: "{{ 'file' if afile.stat.exists else 'touch' }}"
+            owner: root
+            group: root
+            mode: "u-x,go-rwx"
+      when: "'at' in ansible_facts['packages']"
+    - name: 5.1.9 Ensure at is restricted to authorized users | Display message when "at" is not installed
+      debug:
+        msg: "at is not installed on the system"
+      when: "'at' not in ansible_facts['packages']"   
         
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
