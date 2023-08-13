@@ -431,7 +431,13 @@
           shell: authselect create-profile custom-profile -b sssd --symlink-meta
         - name: 5.4.1 Ensure custom authselect profile is used (Manual) | select custom profile "custom-profile"
           shell: authselect select custom/custom-profile with-sudo with-faillock without-nullok
-        
+
+    - name: 5.4.2 Ensure authselect includes with-faillock (Automated)
+      block:
+        - name: 5.4.2 Ensure authselect includes with-faillock (Automated) | Enable with-faillock feature
+          shell: authselect enable-feature with-faillock
+        - name: 5.4.2 Ensure authselect includes with-faillock (Automated) | Apply changes
+          shell: authselect apply-changes
         
      
 
