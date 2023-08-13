@@ -171,7 +171,7 @@
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^LogLevel"
+        regexp: "^#?LogLevel"
         line: "LogLevel INFO"
 
     
@@ -179,50 +179,87 @@
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^UsePAM"
+        regexp: "^#?UsePAM"
         line: "UsePAM yes"
 
     - name: 5.2.7 Ensure SSH root login is disabled
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^PermitRootLogin"
+        regexp: "^#?PermitRootLogin"
         line: "PermitRootLogin no"
         
     - name: 5.2.8 Ensure SSH HostbasedAuthentication is disabled
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^HostbasedAuthentication"
+        regexp: "^#?HostbasedAuthentication"
         line: "HostbasedAuthentication no"
 
     - name: 5.2.9 Ensure SSH PermitEmptyPasswords is disabled
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^PermitEmptyPasswords"
+        regexp: "^#?PermitEmptyPasswords"
         line: "PermitEmptyPasswords no"
 
     - name: 5.2.10 Ensure SSH PermitUserEnvironment is disabled
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^PermitUserEnvironment"
+        regexp: "^#?PermitUserEnvironment"
         line: "PermitUserEnvironment no"
 
     - name: 5.2.11 Ensure SSH IgnoreRhosts is enabled
       lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '^IgnoreRhosts'
+        regexp: '^#?IgnoreRhosts'
         line: 'IgnoreRhosts yes'
 
     - name: 5.2.12 Ensure SSH X11 forwarding is disabled
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^X11Forwarding"
+        regexp: "^#?X11Forwarding"
         line: "X11Forwarding no"
 
+    - name: 5.2.13 Ensure SSH AllowTcpForwarding is disabled
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^#?AllowTcpForwarding"
+        line: "AllowTcpForwarding no"
+
+    - name: 5.2.14 Ensure system-wide crypto policy is not over-ridden
+      shell: 'sed -ri "s/^\s*(CRYPTO_POLICY\s*=.*)$/# \1/" /etc/sysconfig/sshd'; systemctl reload ssh   
+
+    - name: 5.2.15 Ensure SSH warning banner is configured
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^#?Banner"
+        line: "Banner /etc/issue.net"
+
+    - name: 5.2.16 Ensure SSH MaxAuthTries is set to 4 or less
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^#?MaxAuthTries"
+        line: "MaxAuthTries 4"
+
+    - name: 5.2.17 Ensure SSH MaxStartups is configured 
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^#?MaxStartups"
+        line: "MaxStartups 10:30:60"
+
+    - name: 5.2.18 Ensure SSH MaxSessions is set to 10 or less
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^#?MaxSessions"
+        line: "MaxSessions 10"
         
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
