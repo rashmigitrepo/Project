@@ -1,0 +1,6 @@
+---
+handlers:
+  - name: Restart SSH
+      service:
+        name: sshd
+        state: restarted
