@@ -393,17 +393,47 @@
           with_fileglob:
             - /etc/sudoers.d/*
 
-      - name: Modify timestamp_timeout setting in sudoers file
-      lineinfile:
-        path: "{{ item.path }}"
-        state: present
-        regexp: '^.*timestamp_timeout='
-        line: "Defaults timestamp_timeout=15"
-        backrefs: yes
-        validate: 'visudo -c -f %s'
-      loop:
-        - { path: "/etc/sudoers" }
-        - { path: "/etc/sudoers.d/*" }
+    - name: 5.3.6 Ensure sudo authentication timeout is configured correctly
+      block:
+        - name: 5.3.6 Ensure sudo authentication timeout is configured correctly | "/etc/sudoers"
+          lineinfile:
+            path: "/etc/sudoers"
+            state: present
+            regexp: '^Defaults timestamp_timeout='
+            line: "Defaults timestamp_timeout=15"
+            validate: "visudo -cf %s"
+        - name: 5.3.6 Ensure sudo authentication timeout is configured correctly | "/etc/sudoers.d/"
+          lineinfile:
+            path: "{{ item }}"
+            state: present
+            regexp: '^Defaults timestamp_timeout='
+            line: "Defaults timestamp_timeout=15"
+            validate: "visudo -cf %s"
+          with_fileglob:
+            - /etc/sudoers.d/*
+
+    - name: 5.3.7 Ensure access to the su command is restricted 
+      block:
+        - name: 5.3.7 Ensure access to the su command is restricted | adding group
+          group:
+            name: sugroup
+            state: present
+        - name: 5.3.7 Ensure access to the su command is restricted | add line to the /etc/pam.d/su
+          lineinfile:
+            path: /etc/pam.d/su
+            create: true
+            state: present
+            line: 'auth required pam_wheel.so use_uid group=sugroup'
+
+    - name: 5.4.1 Ensure custom authselect profile is used (Manual)
+      block:
+        - name: 5.4.1 Ensure custom authselect profile is used (Manual) | create custom profile "custom-profile"
+          shell: authselect create-profile custom-profile -b sssd --symlink-meta
+        - name: 5.4.1 Ensure custom authselect profile is used (Manual) | select custom profile "custom-profile"
+          shell: authselect select custom/custom-profile with-sudo with-faillock without-nullok
+        
+        
+     
 
 
       
