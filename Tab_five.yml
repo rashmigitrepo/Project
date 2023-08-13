@@ -173,6 +173,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?LogLevel"
         line: "LogLevel INFO"
+      notify:
+        - Restart SSH
 
     
     - name: 5.2.6 Ensure SSH PAM is enabled
@@ -180,7 +182,10 @@
         state: present
         dest: /etc/ssh/sshd_config
         regexp: "^#?UsePAM"
-        line: "UsePAM yes"
+        line: "UsePAM yes
+      notify:
+        - Restart SSH
+        
 
     - name: 5.2.7 Ensure SSH root login is disabled
       lineinfile:
@@ -188,6 +193,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?PermitRootLogin"
         line: "PermitRootLogin no"
+      notify:
+        - Restart SSH
         
     - name: 5.2.8 Ensure SSH HostbasedAuthentication is disabled
       lineinfile:
@@ -195,6 +202,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?HostbasedAuthentication"
         line: "HostbasedAuthentication no"
+      notify:
+        - Restart SSH
 
     - name: 5.2.9 Ensure SSH PermitEmptyPasswords is disabled
       lineinfile:
@@ -202,6 +211,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?PermitEmptyPasswords"
         line: "PermitEmptyPasswords no"
+      notify:
+        - Restart SSH
 
     - name: 5.2.10 Ensure SSH PermitUserEnvironment is disabled
       lineinfile:
@@ -209,12 +220,16 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?PermitUserEnvironment"
         line: "PermitUserEnvironment no"
+      notify:
+        - Restart SSH
 
     - name: 5.2.11 Ensure SSH IgnoreRhosts is enabled
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?IgnoreRhosts'
-        line: 'IgnoreRhosts yes'
+        line: "IgnoreRhosts yes"
+      notify:
+        - Restart SSH
 
     - name: 5.2.12 Ensure SSH X11 forwarding is disabled
       lineinfile:
@@ -222,6 +237,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?X11Forwarding"
         line: "X11Forwarding no"
+      notify:
+        - Restart SSH
 
     - name: 5.2.13 Ensure SSH AllowTcpForwarding is disabled
       lineinfile:
@@ -229,6 +246,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?AllowTcpForwarding"
         line: "AllowTcpForwarding no"
+      notify:
+        - Restart SSH
 
     - name: 5.2.14 Ensure system-wide crypto policy is not over-ridden
       shell: 'sed -ri "s/^\s*(CRYPTO_POLICY\s*=.*)$/# \1/" /etc/sysconfig/sshd'; systemctl reload ssh   
@@ -239,6 +258,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?Banner"
         line: "Banner /etc/issue.net"
+      notify:
+        - Restart SSH
 
     - name: 5.2.16 Ensure SSH MaxAuthTries is set to 4 or less
       lineinfile:
@@ -246,6 +267,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?MaxAuthTries"
         line: "MaxAuthTries 4"
+      notify:
+        - Restart SSH
 
     - name: 5.2.17 Ensure SSH MaxStartups is configured 
       lineinfile:
@@ -253,6 +276,8 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?MaxStartups"
         line: "MaxStartups 10:30:60"
+      notify:
+        - Restart SSH
 
     - name: 5.2.18 Ensure SSH MaxSessions is set to 10 or less
       lineinfile:
@@ -260,6 +285,38 @@
         dest: /etc/ssh/sshd_config
         regexp: "^#?MaxSessions"
         line: "MaxSessions 10"
+      notify:
+        - Restart SSH
+
+    - name: 5.2.19 Ensure SSH LoginGraceTime is set to one minute or less
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^#?LoginGraceTime"
+        line: "LoginGraceTime 60"
+      notify:
+        - Restart SSH
+
+    - name: 5.2.20 Ensure SSH Idle Timeout Interval is configured
+      block:
+        - name: 5.2.20 Ensure SSH Idle Timeout Interval is configured | ClientAlive
+          lineinfile:
+            state: present
+            dest: /etc/ssh/sshd_config
+            regexp: "^#?ClientAliveInterval"
+            line: "ClientAliveInterval 900"
+          notify:
+            - Restart SSH
+        - name: 5.2.20 Ensure SSH Idle Timeout Interval is configured | MaxAlive
+          lineinfile:
+            state: present
+            dest: /etc/ssh/sshd_config
+            regexp: "^#?ClientAliveCountMax"
+            line: "ClientAliveCountMax 0"
+          notify:
+            - Restart SSH
+
+      
         
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
