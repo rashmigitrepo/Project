@@ -170,7 +170,7 @@
     - name: 5.2.5 Ensure SSH LogLevel is appropriate
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?LogLevel"
         line: "LogLevel INFO"
       notify:
@@ -180,7 +180,7 @@
     - name: 5.2.6 Ensure SSH PAM is enabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?UsePAM"
         line: "UsePAM yes
       notify:
@@ -190,7 +190,7 @@
     - name: 5.2.7 Ensure SSH root login is disabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?PermitRootLogin"
         line: "PermitRootLogin no"
       notify:
@@ -199,7 +199,7 @@
     - name: 5.2.8 Ensure SSH HostbasedAuthentication is disabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?HostbasedAuthentication"
         line: "HostbasedAuthentication no"
       notify:
@@ -208,7 +208,7 @@
     - name: 5.2.9 Ensure SSH PermitEmptyPasswords is disabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?PermitEmptyPasswords"
         line: "PermitEmptyPasswords no"
       notify:
@@ -217,7 +217,7 @@
     - name: 5.2.10 Ensure SSH PermitUserEnvironment is disabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?PermitUserEnvironment"
         line: "PermitUserEnvironment no"
       notify:
@@ -234,7 +234,7 @@
     - name: 5.2.12 Ensure SSH X11 forwarding is disabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?X11Forwarding"
         line: "X11Forwarding no"
       notify:
@@ -243,7 +243,7 @@
     - name: 5.2.13 Ensure SSH AllowTcpForwarding is disabled
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?AllowTcpForwarding"
         line: "AllowTcpForwarding no"
       notify:
@@ -255,7 +255,7 @@
     - name: 5.2.15 Ensure SSH warning banner is configured
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?Banner"
         line: "Banner /etc/issue.net"
       notify:
@@ -264,7 +264,7 @@
     - name: 5.2.16 Ensure SSH MaxAuthTries is set to 4 or less
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?MaxAuthTries"
         line: "MaxAuthTries 4"
       notify:
@@ -273,7 +273,7 @@
     - name: 5.2.17 Ensure SSH MaxStartups is configured 
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?MaxStartups"
         line: "MaxStartups 10:30:60"
       notify:
@@ -282,7 +282,7 @@
     - name: 5.2.18 Ensure SSH MaxSessions is set to 10 or less
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?MaxSessions"
         line: "MaxSessions 10"
       notify:
@@ -291,7 +291,7 @@
     - name: 5.2.19 Ensure SSH LoginGraceTime is set to one minute or less
       lineinfile:
         state: present
-        dest: /etc/ssh/sshd_config
+        path: /etc/ssh/sshd_config
         regexp: "^#?LoginGraceTime"
         line: "LoginGraceTime 60"
       notify:
@@ -302,7 +302,7 @@
         - name: 5.2.20 Ensure SSH Idle Timeout Interval is configured | ClientAlive
           lineinfile:
             state: present
-            dest: /etc/ssh/sshd_config
+            path: /etc/ssh/sshd_config
             regexp: "^#?ClientAliveInterval"
             line: "ClientAliveInterval 900"
           notify:
@@ -310,11 +310,72 @@
         - name: 5.2.20 Ensure SSH Idle Timeout Interval is configured | MaxAlive
           lineinfile:
             state: present
-            dest: /etc/ssh/sshd_config
+            path: /etc/ssh/sshd_config
             regexp: "^#?ClientAliveCountMax"
             line: "ClientAliveCountMax 0"
           notify:
             - Restart SSH
+
+    - name: 5.3.1 Ensure sudo is installed
+      dnf:
+        name: sudo
+        state: present
+
+    - name: 5.3.2 Ensure sudo commands use pty
+      block:
+        - name: 5.3.2 Ensure sudo commands use pty | "/etc/sudoers"
+          lineinfile:
+            path: /etc/sudoers
+            state: present
+            insertafter: '^# Defaults specification$'
+            line: "Defaults use_pty"
+            validate: "visudo -cf %s"
+        - name: 5.3.2 Ensure sudo commands use pty | "/etc/sudoers.d/"
+          lineinfile:
+            path: "{{ item }}"
+            state: present
+            insertafter: '^# Defaults specification$'
+            line: "Defaults use_pty"
+            validate: 'visudo -cf %s'
+          with_fileglob:
+            - /etc/sudoers.d/*
+
+    - name: 5.3.3 Ensure sudo log file exists
+      block:
+        - name: 5.3.3 Ensure sudo log file exists | "/etc/sudoers"
+          lineinfile:
+            path: /etc/sudoers
+            state: present
+            insertafter: '^# Defaults specification$'
+            line: 'Defaults logfile="/var/log/sudo.log"'
+            validate: "visudo -cf %s"
+        - name: 5.3.3 Ensure sudo log file exists | "/etc/sudoers.d/"
+          lineinfile:
+            path: "{{ item }}"
+            state: present
+            insertafter: '^# Defaults specification$'
+            line: 'Defaults logfile="/var/log/sudo.log"'
+            validate: 'visudo -cf %s'
+          with_fileglob:
+            - /etc/sudoers.d/*
+
+    - name: 5.3.4 Ensure users must provide password for escalation
+      block:
+        - name: 5.3.4 Ensure users must provide password for escalation | "/etc/sudoers"
+          lineinfile:
+            path: /etc/sudoers
+            state: absent
+            regexp: '^.*NOPASSWD.*$'
+            validate: "visudo -cf %s"
+        - name: 5.3.4 Ensure users must provide password for escalation | "/etc/sudoers.d/"
+          lineinfile:
+            path: "{{ item }}"
+            state: absent
+            regexp: '^.*NOPASSWD.*$'
+            validate: "visudo -cf %s"
+          with_fileglob:
+            - /etc/sudoers.d/*
+
 
       
         
