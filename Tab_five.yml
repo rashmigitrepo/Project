@@ -376,6 +376,35 @@
           with_fileglob:
             - /etc/sudoers.d/*
 
+    - name: 5.3.5 Ensure re-authentication for privilege escalation is not disabled globally
+      block:
+        - name: 5.3.5 Ensure re-authentication for privilege escalation is not disabled globally | "/etc/sudoers"
+          lineinfile:
+            path: /etc/sudoers
+            state: absent
+            regexp: '^.*!authenticate.*$'
+            validate: "visudo -cf %s"
+        - name: 5.3.5 Ensure re-authentication for privilege escalation is not disabled globally | "/etc/sudoers.d/"
+          lineinfile:
+            path: "{{ item }}"
+            state: absent
+            regexp: '^.*!authenticate.*$'
+            validate: "visudo -cf %s"
+          with_fileglob:
+            - /etc/sudoers.d/*
+
+      - name: Modify timestamp_timeout setting in sudoers file
+      lineinfile:
+        path: "{{ item.path }}"
+        state: present
+        regexp: '^.*timestamp_timeout='
+        line: "Defaults timestamp_timeout=15"
+        backrefs: yes
+        validate: 'visudo -c -f %s'
+      loop:
+        - { path: "/etc/sudoers" }
+        - { path: "/etc/sudoers.d/*" }
+
 
       
         
