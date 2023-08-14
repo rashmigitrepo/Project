@@ -454,6 +454,7 @@
             line: 'minclass = 4'
             state: present 
         - name: 5.5.1 Ensure password creation requirements are configured (Automated) | Update system-auth and password-auth files
+          script: script_5_5_1.sh
        
         
      
