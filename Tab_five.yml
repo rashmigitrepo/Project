@@ -557,6 +557,13 @@
        #     dest: file_5_6_1_5
         #    content: "{{ output.stdout_lines }}"
 
+    - name: 5.6.2 Ensure system accounts are secured (Automated)
+      block:
+        - name: 5.6.2 Ensure system accounts are secured (Automated) | set system account to non login shell
+          shell: awk -F: '($1!~/^(root|halt|sync|shutdown|nfsnobody)$/ && $3<'"$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)"' && $7!~/^(\/usr)?\/sbin\/nologin(\/)?$/ && $7!~/(\/usr)?\/bin\/false(\/)?$/) { print $1 }' /etc/passwd | while read user do usermod -s $(which nologin) $user done
+        - name: 5.6.2 Ensure system accounts are secured (Automated) | lock not root system accounts
+          shell: awk -F: '($1!="root" && $1!~/^\+/ && $3<'"$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)"') {print $1}' /etc/passwd | xargs -I '{}' passwd -S '{}' | awk '($2!="L" && $2!="LK") {print $1}' | while read user do usermod -L $user done
+
     - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated)
       block:
         - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated) 
@@ -571,7 +578,7 @@
           loop:
             - /etc/bashrc
             - /etc/profile
-        - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated) | 
+        - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated) | profile.d directory
           lineinfile:
             path: "{{ item }}"
             regexp: '^#?TMOUT'
@@ -580,6 +587,9 @@
             backrefs: yes
           with_fileglob:
             - /etc/profile.d/*
+
+      
+      
 
         
       
