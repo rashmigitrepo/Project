@@ -474,6 +474,20 @@
 
     - name: 5.5.3 Ensure password reuse is limited (Automated)
       script: script_5_5_3.sh
+
+    - name: 5.5.4 Ensure password hashing algorithm is SHA-512 (Automated)
+      block:
+        - name: 5.5.4 Ensure password hashing algorithm is SHA-512 (Automated) | Set password hashing algorithm
+          lineinfile:
+            path: "{{ item.path }}"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+            state: present
+          loop:
+            - { path: /etc/libuser.conf, regexp: '^#?crypt_style', line: 'crypt_style = sha512' }
+            - { path: /etc/login.defs, regexp: '^#?ENCRYPT_METHOD', line: 'ENCRYPT_METHOD SHA512' }
+
+        
         
      
 
