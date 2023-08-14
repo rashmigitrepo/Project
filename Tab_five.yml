@@ -492,79 +492,76 @@
 
         
         
-     
+    - name: 5.6.* Get list of all users | return usernames
+      shell: cat /etc/passwd | grep -E '^[^:]*:[^:]*:[0-9]{4}:' | awk -F':' '{print $1}' #returns usernames
+      register: users_with_name
+      changed_when: false
+
+    - name: 5.6.1.1- Ensure password expiration date is 90 days or less
+      block: 
+        - name: 5.6.1.1- Ensure password expiration date is 90 days or less | set in config file
+          lineinfile:
+            path: /etc/login.defs
+            regexp: '^PASS_MAX_DAYS'
+            line: 'PASS_MAX_DAYS 90'
+            state: present
+        - name: 5.6.1.1- Ensure password expiration date is 90 days or less | Modify user parameters for all users with a password set to match 90
+          shell: chage --maxdays 90 {{ item }}
+          loop: "{{ users_with_name.stdout_lines }}"
+          
+    
+    - name: 5.6.1.2 - Ensure minimum days between password changes is 7 or more
+      block:
+        - name: 5.6.1.2 - Ensure minimum days between password changes is 7 or more | set in config file
+          lineinfile:
+            path: /etc/login.defs
+            regexp: '^PASS_MIN_DAYS'
+            line: 'PASS_MIN_DAYS 7'
+            state: present
+        - name: 5.6.1.2 - Ensure minimum days between password changes is 7 or more | Modify user parameters for all users with a password set to match 7
+          shell: chage --mindays 7 {{ item }}
+          loop: "{{ users_with_name.stdout_lines }}"
 
 
+    - name: 5.6.1.3- Ensure password expiration warning days is 7 or more
+      block:
+        - name: 5.6.1.3- Ensure password expiration warning days is 7 or more | set in config file
+          lineinfile:
+            path: /etc/login.defs
+            regexp: '^PASS_WARN_AGE'
+            line: 'PASS_WARN_AGE 7'
+            state: present
+        - name: 5.6.1.3- Ensure password expiration warning days is 7 or more | Modify user parameters for all users with a password set to match 7
+          shell: chage --warndays 7 {{ item }}
+          loop: "{{ users_with_name.stdout_lines }}"
       
-        
+
+   - name: 5.6.1.4- Ensure inactive password lock is 30 days or less
+      block:
+        - name: 5.6.1.4 Ensure inactive password lock is 30 days or less
+          shell: useradd -D -f 30
+
+        - name: 5.6.1.4 Ensure inactive password lock is 30 days or less | Modify user parameters for all users with a password set to match 30
+          shell: chage --inactive 30 {{ item }}
+          loop: "{{ users_with_name.stdout_lines }}"
+
+    #- name: 5.6.1.5- Ensure all users last password change date is in the past
+     # block:
+     #   - name: 5.6.1.5- Investigate any users with a password change date in future | get list
+       #   shell: cat /etc/passwd | grep -E '^[^:]*:[^:]*:[0-9]{4}:' | awk -F':' '{print $1}'| while read -r user; do if [[ $(date --date="$(chage --list "$user" | grep '^Last password change' | cut -d ':' -f2)" +%s) > $(date +%s) ]]; then echo "$user"; fi; done
+ 
+       #   register: output
+
+      #  - name: 5.6.1.5- Investigate any users with a password change date in future | save list
+       #   copy:
+       #     dest: file_5_6_1_5
+        #    content: "{{ output.stdout_lines }}"
+
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
         name: root
         state: present
         gid: 0
-
-    - name: 5.6.1.1- Ensure password expiration date is 90 days or less
-      lineinfile:
-        path: /etc/login.defs
-        regexp: '^PASS_MAX_DAYS'
-        line: 'PASS_MAX_DAYS 90'
-        state: present
-
-    - name: Get list of all users
-      shell: cat /etc/passwd | grep -E '^[^:]*:[^:]*:[0-9]{4}:' | awk -F':' '{print $1}' #returns usernames
-      register: users_with_name
-      changed_when: false
-
-
-    - name: Modify user parameters for all users with a password set to match 90
-      shell: chage --maxdays 90 {{ item }}
-      loop: "{{ users_with_name.stdout_lines }}"
-
-
-    - name: 5.6.1.2 - Ensure minimum days between password changes is 7 or more
-      lineinfile:
-        path: /etc/login.defs
-        regexp: '^PASS_MIN_DAYS'
-        line: 'PASS_MIN_DAYS 7'
-        state: present
-
-    - name: Modify user parameters for all users with a password set to match 7
-      shell: chage --mindays 7 {{ item }}
-      loop: "{{ users_with_name.stdout_lines }}"
-      changed_when: false
-
-    - name: 5.6.1.3- Ensure password expiration warning days is 7 or more
-      lineinfile:
-        path: /etc/login.defs
-        regexp: '^PASS_WARN_AGE'
-        line: 'PASS_WARN_AGE 7'
-        state: present
-
-    - name:  Modify user parameters for all users with a password set to match 7   
-      shell: chage --warndays 7 {{ item }}
-      loop: "{{ users_with_name.stdout_lines }}"
-      changed_when: false
-
-   - name: 5.6.1.4- Ensure inactive password lock is 30 days or less
-      block:
-        - name: Ensure inactive password lock is 30 days or less
-          shell: useradd -D -f 30
-
-        - name: Modify user parameters for all users with a password set to match- chage --inactive 30
-          shell: chage --inactive 30 {{ item }}
-          loop: "{{ users_with_name.stdout_lines }}"
-
-    - name: 5.6.1.5- Ensure all users last password change date is in the past
-      block:
-        - name: 5.6.1.5- Investigate any users with a password change date in future | get list
-          shell: cat /etc/passwd | grep -E '^[^:]*:[^:]*:[0-9]{4}:' | awk -F':' '{print $1}'| while read -r user; do if [[ $(date --date="$(chage --list "$user" | grep '^Last password change' | cut -d ':' -f2)" +%s) > $(date +%s) ]]; then echo "$user"; fi; done
- 
-          register: output
-
-        - name: 5.6.1.5- Investigate any users with a password change date in future | save list
-          copy:
-            dest: file_5_6_1_5
-            content: "{{ output.stdout_lines }}"
 
 
 
