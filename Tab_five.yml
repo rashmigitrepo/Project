@@ -455,6 +455,21 @@
             state: present 
         - name: 5.5.1 Ensure password creation requirements are configured (Automated) | Update system-auth and password-auth files
           script: script_5_5_1.sh
+
+    - name: 5.5.2 Ensure lockout for failed password attempts is configured (Automated)
+      block:
+        - name: 5.5.2 Ensure lockout for failed password attempts is configured (Automated) | For OS version RHEL 8.2 or later 
+          lineinfile:
+            path: /etc/security/faillock.conf
+            state: present
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+          loop:
+            - { regexp: '^#?deny', line: 'deny = 5' }
+            - { regexp: '^#?unlock_time', line: 'unlock_time = 900' }
+          when: ansible_distribution_version >= "8.2"
+        - name: 5.5.2 Ensure lockout for failed password attempts is configured (Automated) | For OS version RHEL 8.0 and 8.1
+        
        
         
      
