@@ -438,6 +438,23 @@
           shell: authselect enable-feature with-faillock
         - name: 5.4.2 Ensure authselect includes with-faillock (Automated) | Apply changes
           shell: authselect apply-changes
+
+    - name: 5.5.1 Ensure password creation requirements are configured (Automated)
+      block:
+        - name: 5.5.1 Ensure password creation requirements are configured (Automated) | Set pwquality config settings | password minlen
+          lineinfile:
+            path: /etc/security/pwquality.conf
+            regexp: "^#?minlen"
+            line: 'minlen = 14'
+            state: present
+        - name: 5.5.1 Ensure password creation requirements are configured (Automated) | Set pwquality config settings | password complexity
+          lineinfile:
+            path: /etc/security/pwquality.conf
+            regexp: "^#?minclass"
+            line: 'minclass = 4'
+            state: present 
+        - name: 5.5.1 Ensure password creation requirements are configured (Automated) | Update system-auth and password-auth files
+       
         
      
 
