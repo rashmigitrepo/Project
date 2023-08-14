@@ -473,7 +473,7 @@
           when: ansible_distribution_version == "8.0" or ansible_distribution_version == "8.1" 
 
     - name: 5.5.3 Ensure password reuse is limited (Automated)
-      script:
+      script: script_5_5_3.sh
         
      
 
