@@ -488,7 +488,7 @@
             - { path: /etc/login.defs, regexp: '^#?ENCRYPT_METHOD', line: 'ENCRYPT_METHOD SHA512' }
 
         - name: 5.5.4 Ensure password hashing algorithm is SHA-512 (Automated) | Configure pam_unix.so
-          script:
+          script: script_5_5_4.sh
 
         
         
