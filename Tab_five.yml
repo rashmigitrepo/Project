@@ -558,18 +558,31 @@
         #    content: "{{ output.stdout_lines }}"
 
     - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated)
-      blockinfile:
-        path: "{{ item }}"
-        marker: "# {mark} ANSIBLE MANAGED BLOCK - TMOUT configuration"
-        block: |
-          # Set TMOUT according to local site policy (not exceeding 900 or equal to 0)
-          TMOUT=900
-          readonly TMOUT
-          export TMOUT
-      loop:
-        - /etc/bashrc
-        - /etc/profile
-        - /etc/profile.d/*.sh
+      block:
+        - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated) 
+          blockinfile:
+            path: "{{ item }}"
+            marker: "# {mark} ANSIBLE MANAGED BLOCK - TMOUT configuration"
+            block: |
+              # Set TMOUT according to local site policy (not exceeding 900 or equal to 0)
+              TMOUT=900
+              readonly TMOUT
+              export TMOUT
+          loop:
+            - /etc/bashrc
+            - /etc/profile
+        - name: 5.6.3 Ensure default user shell timeout is 900 seconds or less (Automated) | 
+          lineinfile:
+            path: "{{ item }}"
+            regexp: '^#?TMOUT'
+            line: 'readonly TMOUT=900 ; export TMOUT'
+            state: present
+            backrefs: yes
+          with_fileglob:
+            - /etc/profile.d/*
+
+        
+      
       
     - name: 5.6.4- Ensure default group for root account is GID 0
       group:
