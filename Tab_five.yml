@@ -469,7 +469,8 @@
             - { regexp: '^#?unlock_time', line: 'unlock_time = 900' }
           when: ansible_distribution_version >= "8.2"
         - name: 5.5.2 Ensure lockout for failed password attempts is configured (Automated) | For OS version RHEL 8.0 and 8.1
-        
+          script: script_5_5_2.sh
+          when: ansible_distribution_version == "8.0" or ansible_distribution_version == "8.1" 
        
         
      
