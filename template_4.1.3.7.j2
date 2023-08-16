@@ -1,8 +1,8 @@
-{% if uid_min is defined %}
-  -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>={{ uid_min }} -F auid!=unset -k access
-  -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>={{ uid_min }} -F auid!=unset -k access
-  -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>={{ uid_min }} -F auid!=unset -k access
-  -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>={{ uid_min }} -F auid!=unset -k access
+{% if UID_MIN is defined %}
+  -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>={{ UID_MIN }} -F auid!=unset -k access
+  -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>={{ UID_MIN }} -F auid!=unset -k access
+  -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>={{ UID_MIN }} -F auid!=unset -k access
+  -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>={{ UID_MIN }} -F auid!=unset -k access
 {% else %}
   ERROR: Variable 'UID_MIN' is unset.
 {% endif %}
