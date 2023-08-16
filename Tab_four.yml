@@ -5,14 +5,13 @@
   become: yes
 
   tasks:
-  - name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated)
+- name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated)
   block:
     - name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Get UID_MIN from login.defs
       shell: awk '/^\s*UID_MIN/{print $2}' /etc/login.defs
       register: UID_MIN
       changed_when: false
-      
-    - name:  4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Create or Edit Audit Rules File
+    - name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Create or Edit Audit Rules File
       template:
         src: template_4_1_3_7.j2
         dest: /etc/audit/rules.d/50-access.rules
@@ -20,16 +19,13 @@
         #group: root
         #mode: '0640'
       when: UID_MIN.stdout is defined
-
-    - name:  4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Load Audit Rules
+    - name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Load Audit Rules
       shell: augenrules --load
-
-    - name:  4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Check Reboot Requirement
+    - name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Check Reboot Requirement
       shell: if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot required to load rules.\n"; fi
       register: reboot_required
       changed_when: false
-
-    - name:  4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Display Reboot Requirement
+    - name: 4.1.3.7 Ensure unsuccessful file access attempts are collected (Automated) | Display Reboot Requirement
       debug:
         msg: "Reboot required to load rules.\n"
       when: reboot_required.stdout == "Reboot required to load rules.\n"
@@ -41,7 +37,6 @@
       shell: awk '/^\s*UID_MIN/{print $2}' /etc/login.defs
       register: UID_MIN 
       changed_when: false
-
     - name: 4.1.3.9_to_10 Ensure discretionary access control and file system mounts events are collected (Automated) | Create Audit Rules File
       template:
         src: template_4_1_3_9_to_10.j2
@@ -50,19 +45,34 @@
         #group: root
         #mode: '0640'
       when: UID_MIN.stdout is defined
-
     - name: 4.1.3.9_to_10 Ensure discretionary access control and file system mounts events are collected (Automated) | Load Audit Rules
       shell: augenrules --load
-
     - name: 4.1.3.9_to_10 Ensure discretionary access control and file system mounts events are collected (Automated) | Check Reboot Requirement
       shell: if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot required to load rules.\n"; fi
       register: reboot_required
       changed_when: false
-     
-
     - name: 4.1.3.9_to_10 Ensure discretionary access control and file system mounts events are collected (Automated) | Display Reboot Requirement
       debug:
         msg: "Reboot required to load rules.\n"
       when: reboot_required.stdout == "Reboot required to load rules.\n"
 
+- name: 4.1.3.11 Ensure session initiation information is collected (Automated)
+  block:
+    - name: 4.1.3.11 Ensure session initiation information is collected (Automated) | Create or Edit Audit Rules File
+      template:
+        src: template_4_1_3_11.j2
+        dest: /etc/audit/rules.d/50-session.rules
+        #owner: root
+        #group: root
+        #mode: '0640'
+    - name: 4.1.3.11 Ensure session initiation information is collected (Automated) | Load Audit Rules
+      shell: augenrules --load
+    - name: 4.1.3.11 Ensure session initiation information is collected (Automated) | Check Reboot Requirement
+      shell: if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot required to load rules.\n"; fi
+      register: reboot_required
+      changed_when: false
+    - name: 4.1.3.11 Ensure session initiation information is collected (Automated) | Display Reboot Requirement
+      debug:
+        msg: "Reboot required to load rules.\n"
+      when: reboot_required.stdout == "Reboot required to load rules.\n"
    
