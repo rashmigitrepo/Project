@@ -140,7 +140,7 @@
             path: "{{ item }}"
             state: file
             owner: root
-            group: root
+            group: ssh_keys
             mode: u-x,g-wx,o-rwx
           with_items: "{{ private_keys.stdout_lines }}"
           when: private_keys.stdout_lines | length > 0 
