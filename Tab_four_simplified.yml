@@ -72,3 +72,9 @@
         msg: "Reboot required to load rules.\n"
       when: reboot_required.stdout == "Reboot required to load rules.\n"
 
+
+
+
+- name: 4.2.3 Ensure permissions on all logfiles are configured (Automated)
+  shell: |
+    find /var/log/ -type f -perm /g+wx,o+rwx -exec chmod --changes g-wx,o-rwx "{}" +
