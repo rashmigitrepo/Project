@@ -1,6 +1,6 @@
-{% if uid_min is defined %}
--a always,exit -F arch=b64 -S rename,unlink,unlinkat,renameat -F auid>={{ uid_min }} -F auid!=unset -F key=delete
--a always,exit -F arch=b32 -S rename,unlink,unlinkat,renameat -F auid>={{ uid_min }} -F auid!=unset -F key=delete
-{% endif %}
-{% endif %}
+{% if UID_MIN is defined %}
+  -a always,exit -F arch=b64 -S rename,unlink,unlinkat,renameat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=delete
+  -a always,exit -F arch=b32 -S rename,unlink,unlinkat,renameat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=delete
+{% else %}
+  ERROR: Variable 'UID_MIN' is unset.
 {% endif %}
