@@ -36,4 +36,10 @@
     - name: 1.1.10 Disable USB Storage (Automated) | Disable USB
       shell: rmmod usb-storage
 
+
+- name: 1.9 Ensure updates, patches, and additional security software are installed (Manual)
+  package:
+      name: "*"
+      state: latest
+
   
