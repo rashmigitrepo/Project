@@ -1,17 +1,17 @@
 {% if UID_MIN is defined %}
--a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
--a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
--a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
--a always,exit -F arch=b32 -S lchown,fchown,chown,fchownat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
--a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
--a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
+  -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
+  -a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
+  -a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
+  -a always,exit -F arch=b32 -S lchown,fchown,chown,fchownat -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
+  -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
+  -a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>={{ UID_MIN.stdout }} -F auid!=unset -F key=perm_mod
 {% else %}
-ERROR: Variable 'UID_MIN' is unset.
+  ERROR: Variable 'UID_MIN' is unset.
 {% endif %}
 
 {% if UID_MIN is defined %}
--a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -k mounts
--a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -k mounts
+  -a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -k mounts
+  -a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -k mounts
 {% else %}
-ERROR: Variable 'UID_MIN' is unset.
+  ERROR: Variable 'UID_MIN' is unset.
 {% endif %}
