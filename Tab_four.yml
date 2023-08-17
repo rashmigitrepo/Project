@@ -188,7 +188,7 @@
         #group: root
         #mode: '0640'
       when: UID_MIN.stdout is defined
-    - name:4.1.3.15_&_17 Ensure successful and unsuccessful attempts to use the chcon and chacl command are recorded (Automated) | Load Audit Rules
+    - name: 4.1.3.15_&_17 Ensure successful and unsuccessful attempts to use the chcon and chacl command are recorded (Automated) | Load Audit Rules
       shell: augenrules --load
     - name: 4.1.3.15_&_17 Ensure successful and unsuccessful attempts to use the chcon and chacl command are recorded (Automated) | Check Reboot Requirement
       shell: if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot required to load rules.\n"; fi
