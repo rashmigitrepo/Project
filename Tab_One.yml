@@ -1,1 +1,39 @@
+---
+- name: Tab Four
+  hosts: your_target_hosts
+  gather_facts: yes
+  become: yes
 
+  tasks:
+
+- name: 1.1.9 Disable Automounting (Automated) | Check Autofs Package Dependencies
+  shell: dnf repoquery --installed --whatrequires autofs
+  register: autofs_dependencies
+  ignore_errors: true  # Ignore errors if the package is not installed or if there are no dependencies
+
+- name: 1.1.9 Disable Automounting (Automated) |Remove Autofs Package and disable it
+  block:
+    - name: Remove autofs
+      dnf:
+        name: autofs
+        state: absent
+    - name: 1.1.9 Disable Automounting (Automated) | Disable autofs service
+      service:
+        name: autofs
+        enabled: no
+  when: autofs_dependencies.stdout == ""
+
+
+- name: 1.1.10 Disable USB Storage (Automated)
+  block:
+    - name: 1.1.10 Disable USB Storage (Automated) | Create conf file
+      lineinfile:
+        dest: /etc/modprobe.d/usb_storage.conf
+        regexp: "^(#)?install usb-storage(\\s|$)"
+        line: "install usb-storage /bin/true"
+        state: present
+        create: true
+    - name: 1.1.10 Disable USB Storage (Automated) | Disable USB
+      shell: rmmod usb-storage
+
+  
