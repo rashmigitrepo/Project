@@ -1,28 +1,47 @@
 - name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /tmp partition (Automated) | Add options
   replace:
     path: /etc/fstab
-    regexp: '^(\S+\s+/tmp\s+\S+\s+)([0-9]+\s+[0-9]+)$'
+    regexp: '^(\S+\s+/tmp\s+\S+\s+\S+\s+)([0-9]+\s+[0-9]+)$'
     replace: '\1defaults,rw,nodev,noexec,nosuid,relatime \2'
     backup: yes
-- name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Remount
+- name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /tmp partition (Automated) | Remount
   shell: mount -o remount /tmp
 
 
 - name: 1.1.3.2_to_4 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Add options
   replace:
     path: /etc/fstab
-    regexp: '^(\S+\s+/var\s+\S+\s+)([0-9]+\s+[0-9]+)$'
+    regexp: '^(\S+\s+/var\s+\S+\s+\S+\s+)([0-9]+\s+[0-9]+)$'
     replace: '\1defaults,rw,nodev,noexec,nosuid,relatime \2'
     backup: yes
 - name: 1.1.3.2_to_4 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Remount
   shell: mount -o remount /var
 
 
-- name: 1.1.7.2_to_3 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Add options
+- name: 1.1.4.2_to_4 Ensure nodev, noexec, and nosuid options set on /var/tmp partition (Automated) | Add options
   replace:
     path: /etc/fstab
-    regexp: '^(\S+\s+/home\s+\S+\s+)([0-9]+\s+[0-9]+)$'
+    regexp: '^(\S+\s+/var/tmp\s+\S+\s+\S+\s+)([0-9]+\s+[0-9]+)$'
     replace: '\1defaults,rw,nodev,noexec,nosuid,relatime \2'
     backup: yes
-- name: 1.1.7.2_to_3 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Remount
+- name: 1.1.4.2_to_4 Ensure nodev, noexec, and nosuid options set on /var/tmp partition (Automated) | Remount
+  shell: mount -o remount /var/tmp
+
+- name: 1.1.7.2_to_3 Ensure nodev, noexec, and nosuid options set on /home partition (Automated) | Add options
+  replace:
+    path: /etc/fstab
+    regexp: '^(\S+\s+/home\s+\S+\s+\S+\s+)([0-9]+\s+[0-9]+)$'
+    replace: '\1defaults,rw,nodev,noexec,nosuid,relatime \2'
+    backup: yes
+- name: 1.1.7.2_to_3 Ensure nodev, noexec, and nosuid options set on /home partition (Automated) | Remount
   shell: mount -o remount /home
+
+  - name: 1.1.8.1_to_3 Ensure nodev, noexec, and nosuid options set on /dev/shm partition (Automated) | Add options
+  replace:
+    path: /etc/fstab
+    regexp: '^(\S+\s+/dev/shm\s+\S+\s+\S+\s+)([0-9]+\s+[0-9]+)$'
+    replace: '\1defaults,rw,nodev,noexec,nosuid,relatime \2'
+    backup: yes
+- name: 1.1.4.2_to_4 Ensure nodev, noexec, and nosuid options set on /dev/shm partition (Automated) | Remount
+  shell: mount -o remount /dev/shm
+  
