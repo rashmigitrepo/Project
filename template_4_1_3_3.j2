@@ -1,5 +1,5 @@
-{% if sudo_log_file_escaped is defined and sudo_log_file_escaped != '' %}
-  -w {{ sudo_log_file }} -p wa -k sudo_log_file
-{%- else %}
+{% if SUDO_LOG_FILE_ESCAPED is defined and SUDO_LOG_FILE_ESCAPED != '' %}
+  -w {{ SUDO_LOG_FILE.stdout }} -p wa -k sudo_log_file
+{% else %}
   ERROR: Variable 'SUDO_LOG_FILE_ESCAPED' is unset.
-{%- endif %}
+{% endif %}
