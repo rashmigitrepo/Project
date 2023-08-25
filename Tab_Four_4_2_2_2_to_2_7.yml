@@ -1,0 +1,239 @@
+# 4.2.1.1	Ensure rsyslog is installed (Automated)
+
+- name: 4.2.1.1	Ensure rsyslog is installed (Automated)
+  package:
+    name: rsyslog
+    state: present
+
+- name: 4.2.1.2	Ensure rsyslog service is enabled (Automated)    //handlers
+  service:
+    name: rsyslog
+    state: started
+    enabled: yes
+
+# 4.2.1.3	Ensure journald is configured to send logs to rsyslog (Manual)
+
+- name: 4.2.1.3	Ensure journald is configured to send logs to rsyslog (Manual)
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    line: "ForwardToSyslog=yes"
+    state: present 
+    notify:
+      - Restart rsyslog  
+
+  handlers:
+    - name: Restart rsyslog
+      service:
+        name: rsyslog
+        state: restarted
+
+
+# 4.2.1.5	Ensure logging is configured (Manual)
+
+- name: 4.2.1.5	Ensure logging is configured (Manual) | Edit /etc/rsyslog.conf
+  blockinfile:
+    path: /etc/rsyslog.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
+    block: |
+      *.emerg :omusrmsg:*
+      auth,authpriv.* /var/log/secure
+      mail.* -/var/log/mail
+      mail.info -/var/log/mail.info
+      mail.warning -/var/log/mail.warn
+      mail.err /var/log/mail.err
+      cron.* /var/log/cron
+      *.=warning;*.=err -/var/log/warn
+      *.crit /var/log/warn
+      *.*;mail.none;news.none -/var/log/messages
+      local0,local1.* -/var/log/localmessages
+      local2,local3.* -/var/log/localmessages
+      local4,local5.* -/var/log/localmessages
+      local6,local7.* -/var/log/localmessages
+  loop: [''] 
+
+- name: 4.2.1.5	Ensure logging is configured (Manual) | Edit /etc/rsyslog.d/*.conf files
+  blockinfile:
+    path: "{{ item }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      *.emerg :omusrmsg:*
+      auth,authpriv.* /var/log/secure
+      mail.* -/var/log/mail
+      mail.info -/var/log/mail.info
+      mail.warning -/var/log/mail.warn
+      mail.err /var/log/mail.err
+      cron.* /var/log/cron
+      *.=warning;*.=err -/var/log/warn
+      *.crit /var/log/warn
+      *.*;mail.none;news.none -/var/log/messages
+      local0,local1.* -/var/log/localmessages
+      local2,local3.* -/var/log/localmessages
+      local4,local5.* -/var/log/localmessages
+      local6,local7.* -/var/log/localmessages
+  loop: "{{ log_files_list }}"
+  vars:
+    log_files_list: "{{ lookup('fileglob', '/etc/rsyslog.d/*.conf') }}"
+
+handlers:
+- name: Restart rsyslog    //handlers
+  service:
+    name: rsyslog
+    state: restarted
+
+# 4.2.1.6	Ensure rsyslog is configured to send logs to a remote log host (Manual)
+
+- name: 4.2.1.6	Ensure rsyslog is configured to send logs to a remote log host (Manual) | Edit /etc/rsyslog.conf
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regex: '^#?(\*\.\* action\(type="omfwd" target=").*$'
+    line: '\g<1>loghost.example.com" port="514" protocol="tcp" action.resumeRetryCount="100" queue.type="LinkedList" queue.size="1000")'
+    backup: yes
+
+- name: 4.2.1.6	Ensure rsyslog is configured to send logs to a remote log host (Manual) |  Edit /etc/rsyslog.d/*.conf files
+  blockinfile:
+    path: "{{ item }}"
+    backup: yes
+    block: |
+      *.* action(type="omfwd" target="loghost.example.com" port="514" protocol="tcp" action.resumeRetryCount="100" queue.type="LinkedList" queue.size="1000")
+  loop: "{{ log_files_list }}"
+  vars:
+    log_files_list: "{{ lookup('fileglob', '/etc/rsyslog.d/*.conf') }}"
+
+- name: Restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+
+
+# 4.2.2.1.1	Ensure systemd-journal-remote is installed (Manual)
+
+- name: 4.2.2.1.1	Ensure systemd-journal-remote is installed (Manual) | Install systemd-journal-remote package
+  package:
+    name: systemd-journal-remote
+    state: present
+
+
+
+# 4.2.2.1.2	Ensure systemd-journal-remote is configured (Manual)
+
+- name: 4.2.2.1.2	Ensure systemd-journal-remote is configured (Manual) Set configuration options in systemd-journal-upload.conf
+  blockinfile:
+    path: /etc/systemd/journal-upload.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
+    block: |
+      URL=192.168.50.42
+      ServerKeyFile=/etc/ssl/private/journal-upload.pem
+      ServerCertificateFile=/etc/ssl/certs/journal-upload.pem
+      TrustedCertificateFile=/etc/ssl/ca/trusted.pem
+  loop: [''] 
+  notify:
+    - Restart systemd-journal-upload  
+
+handlers:
+  - name: Restart systemd-journal-upload   //handlers
+    service:
+      name: systemd-journal-upload
+      state: restarted
+
+# 4.2.2.1.3	Ensure systemd-journal-remote is enabled (Manual)
+
+- name: 4.2.2.1.3	Ensure systemd-journal-remote is enabled (Manual) | Enable and start systemd-journal-upload
+  service:
+    name: systemd-journal-upload.service
+    state: started
+    enabled: yes
+
+# 4.2.2.1.4	Ensure journald is not configured to recieve logs from a remote client (Automated)
+
+- name: 4.2.2.1.4	Ensure journald is not configured to recieve logs from a remote client (Automated) | Disable and stop systemd-journal-remote.socket using systemctl
+  systemd:
+    name: systemd-journal-remote.socket
+    state: stopped
+    enabled: no
+    masked: yes
+
+#- name: 4.2.2.1.4	Ensure journald is not configured to recieve logs from a remote client (Automated) | Mask systemd-journal-remote.socket using systemctl
+# systemd:
+    #  name: systemd-journal-remote.socket
+    # state: masked
+
+
+# 4.2.2.3	Ensure journald is configured to compress large log files (Automated)
+
+- name: 4.2.2.3	Ensure journald is configured to compress large log files (Automated) | Add "Compress=yes" to /etc/systemd/journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    line: "Compress=yes"
+    state: present
+  notify:
+    - Restart systemd-journal-upload
+
+handlers:
+- name: Restart systemd-journal-upload
+  service:
+    name: systemd-journal-upload
+    state: restarted
+
+# 4.2.2.4	Ensure journald is configured to write logfiles to persistent disk (Automated)
+
+- name: 4.2.2.4	Ensure journald is configured to write logfiles to persistent disk (Automated) | Add "Storage=persistent" to /etc/systemd/journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    line: "Storage=persistent"
+    state: present
+  notify:
+    - Restart systemd-journal-upload 
+
+handlers:
+- name: Restart systemd-journal-upload
+  service:
+    name: systemd-journal-upload
+    state: restarted
+
+
+# 4.2.2.5	Ensure journald is not configured to send logs to rsyslog (Manual)
+
+- name: 4.2.2.5	Ensure journald is not configured to send logs to rsyslog (Manual) | Remove "ForwardToSyslog=yes" from /etc/systemd/journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    state: absent
+    regexp: "^ForwardToSyslog=yes$"
+  notify:
+    - Restart systemd-journal-upload
+
+handlers:
+- name: Restart systemd-journal-upload
+  service:
+    name: systemd-journal-upload
+    state: restarted
+
+
+# 4.2.2.7	Ensure journald default file permissions configured (Manual)
+
+- name: 4.2.2.7	Ensure journald default file permissions configured (Manual) | Check if /etc/tmpfiles.d/systemd.conf exists
+  stat:
+    path: /etc/tmpfiles.d/systemd.conf
+  register: tmpfiles_conf_stat
+
+- name: 4.2.2.7	Ensure journald default file permissions configured (Manual) | Copy /usr/lib/tmpfiles.d/systemd.conf to /etc/tmpfiles.d/ if not present
+  copy:
+    src: /usr/lib/tmpfiles.d/systemd.conf
+    dest: /etc/tmpfiles.d/systemd.conf
+    remote_src: yes
+  when: not tmpfiles_conf_stat.stat.exists
+
+- name: 4.2.2.7	Ensure journald default file permissions configured (Manual) | Set permissions for /etc/tmpfiles.d/systemd.conf as required
+  file:
+    path: /etc/tmpfiles.d/systemd.conf
+    mode: "{{ tmpfiles_conf_permissions }}"
+  when: tmpfiles_conf_stat.stat.exists
+  vars:
+    tmpfiles_conf_permissions: "0640"
+
+
+
+
+
+
+
+
