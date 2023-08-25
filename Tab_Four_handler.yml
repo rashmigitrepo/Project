@@ -1,0 +1,9 @@
+- name: Restart rsyslog
+      service:
+        name: rsyslog
+        state: restarted
+
+- name: Restart systemd-journal-upload   
+    service:
+      name: systemd-journal-upload
+      state: restarted
