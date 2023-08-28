@@ -1,0 +1,12 @@
+- name: 4.2.1.4 Ensure rsyslog default file permissions are configured (Automated)
+  blockinfile:
+    path: "{{ item }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - rsyslog FileCreateMode configuration"
+    block: |
+      # Set rsyslog FileCreateMode to 0640 or more restrictive
+      $FileCreateMode 0640
+  loop:
+    - /etc/rsyslog.conf
+    - "{{ lookup('fileglob', '/etc/rsyslog.d/*.conf') }}"
+  notify:
+      - Restart rsyslog  
