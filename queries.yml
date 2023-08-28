@@ -1,0 +1,20 @@
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, nosuid, usrquota, grpquota options set on /home partition (Automated) | Add options
+  replace:
+    path: /etc/fstab
+    regexp: '^(\S+\s+/home\s+\S+\s+\S+\s+)([0-9]+\s+[0-9]+)$'
+    replace: '\1defaults,rw,nodev,noexec,nosuid,usrquota,grpquota,relatime \2'
+    backup: yes
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Remount
+  shell: mount -o remount /home
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Create quota database
+  shell: quotacheck -cugv /home
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Restore SELinux on the quota database files
+  shell: restorecon /home/aquota.{{ item }}
+  loop:
+    - user
+    - group
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Enable quotas on the partition
+  shell: quotaon -vug /home
+
+
+
