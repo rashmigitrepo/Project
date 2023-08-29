@@ -1,0 +1,67 @@
+---
+- name: 6.1.11 Ensure no world writable files exist
+  block:
+    - name: 6.1.11 Ensure no world writable files exist | Get list of world-writable files
+      shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -0002
+      register: output_6_1_11
+    - name: 6.1.11 Ensure no world writable files exist | Adjust world-writable files if they exist (Configurable)
+      file:
+        path: '{{ item }}'
+        mode: o-w
+      loop: "{{ output_6_1_11.stdout_lines }}"
+      when: output_6_1_11.stdout_lines is defined and output_6_1_11.stdout_lines | length > 0
+
+
+- name: 6.1.12 Ensure no unowned files or directories exist (Automated)
+  block:
+    - name: 6.1.12 Ensure no unowned files or directories exist (Automated) | Find
+      shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser
+      register: output_6_1_12
+    - name: 6.1.12 Ensure no unowned files or directories exist (Automated) | Fix
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: root
+      loop: "{{ output_6_1_12.stdout_lines }}"
+      when: output_6_1_12.stdout_lines is defined and output_6_1_12.stdout_lines | length > 0
+
+
+- name: 6.1.13 Ensure no ungrouped files or directories exist (Automated)
+  block:
+    - name: 6.1.13 Ensure no ungrouped files or directories exist (Automated) | Find
+      shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup
+      register: output_6_1_13
+    - name: 6.1.13 Ensure no ungrouped files or directories exist (Automated) | Fix
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: root
+      loop: "{{ output_6_1_13.stdout_lines }}"
+      when: output_6_1_13.stdout_lines is defined and output_6_1_13.stdout_lines | length > 0
+
+
+
+- name: 6.1.14 Audit SUID executables (Manual)
+  block:
+      - name: 6.1.14 Audit SUID executables (Manual) | Find all SUID executables
+        shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -4000
+        register: output_6_1_14
+      - name: 6.1.14 Audit SUID executables (Manual) | set fact SUID executables
+        set_fact:
+          output_6_1_14_suid_found: true
+        loop: "{{ output_6_1_14.results }}"
+        when:
+          - item | length > 0
+          - item.stdout is defined  # skipped items are part of results list, but don't have the registered module properties
+          - item.stdout | length > 0
+      - name: 6.1.14 Audit SUID executables (Manual) |  Alert SUID executables exist
+        debug:
+          msg: "Warning!! -- SUID set on items in {{ output_6_1_14 | json_query('results[*].stdout_lines[*]') | flatten }}"  # noqa: jinja[invalid]
+        when: output_6_1_14_suid_found
+  vars:
+    output_6_1_14_suid_found: false
+
+      
+           
+
+     
