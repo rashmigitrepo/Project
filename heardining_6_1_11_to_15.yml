@@ -61,6 +61,28 @@
   vars:
     output_6_1_14_suid_found: false
 
+
+
+- name: 6.1.15 Audit SGID executables (Manual)
+  block:
+    - name: 6.1.15 Audit SGID executables (Manual) | Find all SGID executables
+      shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -2000
+      register: output_6_1_15
+    - name: 6.1.15 Audit SGID executables (Manual) | Set fact SGID executables
+      set_fact:
+        output_6_1_15_suid_found: true
+      loop: "{{ output_6_1_15.results }}"
+      when:
+        - item | length > 0
+        - item.stdout is defined  # skipped items are part of results list, but don't have the registered module properties
+        - item.stdout | length > 0
+    - name: 6.1.15 Audit SGID executables (Manual) |  Alert SGID executables exist
+      debug:
+        msg: "Warning!! -- SGID set on items in {{ output_6_1_15 | json_query('results[*].stdout_lines[*]') | flatten }}"  # noqa: jinja[invalid]
+      when: output_6_1_15_suid_found
+  vars:
+    output_6_1_15_suid_found: false
+  
       
            
 
