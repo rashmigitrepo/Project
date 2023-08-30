@@ -1,0 +1,3 @@
+---
+- name: 6.2.13 Ensure users' .netrc Files are not group or world accessible (Automated)
+  script: script_6_2_13.sh
