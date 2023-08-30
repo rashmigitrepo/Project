@@ -1,0 +1,58 @@
+- name: 6.2.1 Ensure password fields are not empty (Automated)
+  block:
+    - name: 6.2.1 Ensure password fields are not empty (Automated) | Modify PAM Configuration for password-auth
+      replace:
+        path: /etc/pam.d/password-auth
+        regexp: '^password required pam_.*'
+        replace: 'password required pam_something.so try_first_pass'
+    - name: 6.2.1 Ensure password fields are not empty (Automated) | Modify PAM Configuration for system-auth
+      replace:
+        path: /etc/pam.d/system-auth
+        regexp: '^password required pam_.*'
+        replace: 'password required pam_something.so try_first_pass'
+
+
+- name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated)
+  block:
+    - name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated) | Create Backups of passwd and group files
+      copy:
+        src: "/etc/{{ item }}"
+        dest: "/etc/{{ item }}_backup"
+      loop:
+        - passwd
+        - group
+    - name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated) | Check for Group Discrepancies
+      shell: awk -F: 'NR==FNR{a[$1];next} !($1 in a) {print $1}' /etc/group /etc/passwd
+      register: missing_groups 
+
+    - name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated) | Print
+      debug:
+        msg: "Group, {{ item }}, from /etc/passwd has no matching entry in /etc/group.\n" 
+      loop: "{{ missing_groups.stdout_lines }}"
+      when: missing_groups.stdout_lines | length > 0
+      
+    - name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated) | Add Missing Groups to /etc/group
+      group:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ missing_groups.stdout_lines }}" 
+      when: missing_groups.stdout_lines | length > 0
+
+    - name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated) | Verify Changes
+      shell: awk -F: 'NR==FNR{a[$1];next} !($1 in a) {print $1}' /etc/group /etc/passwd
+      register: rechecked_groups
+
+    - name: 6.2.2 Ensure all groups in /etc/passwd exist in /etc/group (Automated) | Print
+      debug:
+        msg: "All groups in /etc/passwd have matching entries in /etc/group."
+      when: rechecked_groups.stdout_lines | length == 0
+
+   # - name: Remove Backup Files (Optional)
+   #   file:
+   #     path: "/etc/{{ item }}_backup"
+   #     state: absent
+     # loop:
+     #   - passwd
+     #   - group
+      
+      
