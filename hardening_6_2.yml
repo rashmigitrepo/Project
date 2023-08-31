@@ -75,4 +75,20 @@
       debug:
         msg: "There are no duplicate UIDs"
       when: output_6_2_3.stdout_lines | length == 0
+
+
+
+- name: 6.2.4 Ensure no duplicate GIDs exist (Automated)
+  block:
+    - name: 6.2.4 Ensure no duplicate GIDs exist (Automated) | list
+      shell: script_6_2_4.sh
+      register: output_6_2_4
+    - name: 6.2.4 Ensure no duplicate GIDs exist (Automated) | print
+      debug:
+        msg: "Warning!! The following groups have duplicate GIDs: {{ output_6_2_4.stdout_lines }}"
+      when: output_6_2_4.stdout_lines | length > 0
+    - name: 6.2.4 Ensure no duplicate GIDs exist (Automated) | print
+      debug:
+        msg: "There are no duplicate GIDs"
+      when: output_6_2_4.stdout_lines | length == 0
       
