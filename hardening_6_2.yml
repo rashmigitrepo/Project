@@ -95,16 +95,30 @@
 
 - name: 6.2.5 Ensure no duplicate user names exist (Automated)
   block:
-    - name: Ensure no duplicate user names exist (Automated) | list
+    - name: 6.2.5 Ensure no duplicate user names exist (Automated) | list
       shell: script_6_2_5.sh
       register: output_6_2_5
-    - name: Ensure no duplicate user names exist (Automated) | print
+    - name: 6.2.5 Ensure no duplicate user names exist (Automated) | print
       debug:
         msg: "Warning!! The following user names are duplicates: {{ output_6_2_5.stdout_lines }}"
       when: output_6_2_5.stdout_lines | length > 0
-    - name: Ensure no duplicate user names exist (Automated) | print
+    - name: 6.2.5 Ensure no duplicate user names exist (Automated) | print
       debug:
         msg: "There are no duplicate user names"
       when: output_6_2_5.stdout_lines | length == 0
 
+
+- name: 6.2.6 Ensure no duplicate group names exist (Automated)
+  block:
+    - name: 6.2.6 Ensure no duplicate group names exist (Automated) | list
+      shell: script_6_2_6.sh
+      register: output_6_2_6
+    - name: 6.2.6 Ensure no duplicate group names exist (Automated) | print
+      debug:
+        msg: "Warning!! The following group names are duplicates: {{ output_6_2_6.stdout_lines }}"
+      when: output_6_2_6.stdout_lines | length > 0
+    - name: 6.2.6 Ensure no duplicate group names exist (Automated) | print
+      debug:
+        msg: "There are no duplicate group names"
+      when: output_6_2_6.stdout_lines | length == 0
       
