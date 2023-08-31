@@ -59,5 +59,20 @@
      # loop:
      #   - passwd
      #   - group
-      
+
+
+
+- name: 6.2.3 Ensure no duplicate UIDs exist (Automated)
+  block:
+    - name: 6.2.3 Ensure no duplicate UIDs exist (Automated) | list
+      shell: script_6_2_3.sh
+      register: output_6_2_3
+    - name: 6.2.3 Ensure no duplicate UIDs exist (Automated) | print
+      debug:
+        msg: "Warning!! The following users have UIDs that are duplicates: {{ output_6_2_3.stdout_lines }}"
+      when: output_6_2_3.stdout_lines | length > 0
+    - name: 6.2.3 Ensure no duplicate UIDs exist (Automated) | print
+      debug:
+        msg: "There are no duplicate UIDs"
+      when: output_6_2_3.stdout_lines | length == 0
       
