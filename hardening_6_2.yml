@@ -91,4 +91,20 @@
       debug:
         msg: "There are no duplicate GIDs"
       when: output_6_2_4.stdout_lines | length == 0
+
+
+- name: 6.2.5 Ensure no duplicate user names exist (Automated)
+  block:
+    - name: Ensure no duplicate user names exist (Automated) | list
+      shell: script_6_2_5.sh
+      register: output_6_2_5
+    - name: Ensure no duplicate user names exist (Automated) | print
+      debug:
+        msg: "Warning!! The following user names are duplicates: {{ output_6_2_5.stdout_lines }}"
+      when: output_6_2_5.stdout_lines | length > 0
+    - name: Ensure no duplicate user names exist (Automated) | print
+      debug:
+        msg: "There are no duplicate user names"
+      when: output_6_2_5.stdout_lines | length == 0
+
       
