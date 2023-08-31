@@ -1,0 +1,6 @@
+{% if UID_MIN is defined %}
+  -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>={{ UID_MIN.stdout }} -F auid!=unset -k access
+  -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>={{ UID_MIN.stdout }} -F auid!=unset -k access
+  -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>={{ UID_MIN.stdout }} -F auid!=unset -k access
+  -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>={{ UID_MIN.stdout }} -F auid!=unset -k access
+{% endif %}
