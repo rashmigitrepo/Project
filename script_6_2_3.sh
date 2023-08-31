@@ -1,4 +1,4 @@
-# 6.2.3
+#6.2.3
 #!/bin/bash
 cat /etc/passwd | cut -f3 -d":" | sort -n | uniq -c | while read x ; do
   [ -z "${x}" ] && break 
