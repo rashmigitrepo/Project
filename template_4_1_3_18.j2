@@ -1,0 +1,3 @@
+{% if UID_MIN is defined %}
+  -a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>={{ UID_MIN.stdout }} -F auid!=unset -k usermod
+{% endif %}
