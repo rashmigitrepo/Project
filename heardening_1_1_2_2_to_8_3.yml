@@ -1,3 +1,13 @@
+- name: 1.1.2.2_to_8.3 Ensure nodev, noexec, and nosuid options set on  partition (Automated) | Statistics of backup of /etc/fstab
+  stat:
+    path: /etc/fstab_backup
+  register: backup_stat
+- name: 1.1.2.2_to_8.3 Ensure nodev, noexec, and nosuid options set on  partition (Automated) | Take backup of /etc/fstab
+  copy: 
+    src: /etc/fstab
+    dest: /etc/fstab_backup
+  when: not backup_stat.stat.exists
+  
 - name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /tmp partition (Automated) | Add options
   shell: sed -i -E '/\/tmp\s/ {/rw,nodev,noexec,nosuid,relatime/! s/defaults/defaults,rw,nodev,noexec,nosuid,relatime /}' /etc/fstab
 - name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /tmp partition (Automated) | Remount
