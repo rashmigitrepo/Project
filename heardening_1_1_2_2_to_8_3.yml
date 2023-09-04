@@ -1,0 +1,33 @@
+- name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /tmp partition (Automated) | Add options
+  shell: sed -i -E '/\/tmp\s/ {/rw,nodev,noexec,nosuid,relatime/! s/defaults/defaults,rw,nodev,noexec,nosuid,relatime /}' /etc/fstab
+- name: 1.1.2.2_to_4 Ensure nodev, noexec, and nosuid options set on /tmp partition (Automated) | Remount
+  shell: mount -o remount /tmp
+
+- name: 1.1.3.2_to_4 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Add options
+  shell: sed -i -E '/\/var\s/ {/rw,nodev,noexec,nosuid,relatime/! s/defaults/defaults,rw,nodev,noexec,nosuid,relatime /}' /etc/fstab
+- name: 1.1.3.2_to_4 Ensure nodev, noexec, and nosuid options set on /var partition (Automated) | Remount
+  shell: mount -o remount /var
+
+- name: 1.1.4.2_to_4 Ensure nodev, noexec, and nosuid options set on /var/tmp partition (Automated) | Add options
+  shell: sed -i -E '/\/var/tmp\s/ {/rw,nodev,noexec,nosuid,relatime/! s/defaults/defaults,rw,nodev,noexec,nosuid,relatime /}' /etc/fstab
+- name: 1.1.4.2_to_4 Ensure nodev, noexec, and nosuid options set on /var/tmp partition (Automated) | Remount
+  shell: mount -o remount /var/tmp
+
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid options set on /home partition (Automated) | Add options
+  shell: sed -i -E '/\/home\s/ {/rw,nodev,noexec,nosuid,usrquota,grpquota,relatime/! s/defaults/defaults,rw,nodev,noexec,nosuid,usrquota,grpquota,relatime /}' /etc/fstab
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid options set on /home partition (Automated) | Remount
+  shell: mount -o remount /home
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Create quota database
+  shell: quotacheck -cugv /home
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Restore SELinux on the quota database files
+  shell: restorecon /home/aquota.{{ item }}
+  loop:
+    - user
+    - group
+- name: 1.1.7.2_to_5 Ensure nodev, noexec, and nosuid, usrquota, grpquota options set on /home partition (Automated) | Enable quotas on the partition
+  shell: quotaon -vug /home
+
+- name: 1.1.8.1_to_3 Ensure nodev, noexec, and nosuid options set on /dev/shm partition (Automated) | Add options
+  shell: sed -i -E '/\/dev/shm\s/ {/rw,nodev,noexec,nosuid,relatime/! s/defaults/defaults,rw,nodev,noexec,nosuid,relatime /}' /etc/fstab
+- name: 1.1.8.1_to_3 Ensure nodev, noexec, and nosuid options set on /dev/shm partition (Automated) | Remount
+  shell: mount -o remount /dev/shm
